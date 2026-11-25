@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <!-- Custom CSS -->
-  <link rel="stylesheet" href="style.css?v=1.5">
+  <link rel="stylesheet" href="style.css?v=1.6">
 </head>
 
 <body>
@@ -36,44 +36,8 @@
   <!-- Mobile Portrait Container (Portrait 6:19 / 9:19 Android Aspect Ratio) -->
   <div id="app">
 
-    <!-- COVER / OPENING SCREEN (Light white-ivory background) -->
-    <div id="opening-screen" class="screen active">
-      <div class="white-overlay"></div>
-
-      <!-- Top Decorative Border -->
-      <div class="decor-top"></div>
-
-      <div class="opening-content">
-        <!-- Header with Title & Initials A & R -->
-        <div class="opening-header">
-          <!-- "UNDANGAN" Text (Slides in from top, deep maroon color) -->
-          <h1 class="undangan-title animate-from-top">UNDANGAN</h1>
-          <!-- Aesthetic Initials A & R (Placed right below UNDANGAN) -->
-          <div class="opening-initials">A & R</div>
-        </div>
-
-        <!-- Central Ornament (ornamen2.png) - Enlarged, clean, floats in center -->
-        <div class="ornament-container">
-          <img src="ornamen2.png" alt="Ornamen Pembuka" class="opening-ornament">
-        </div>
-
-        <!-- Swipe Right Instruction / Unlock Slider -->
-        <div class="swipe-container">
-          <div class="swipe-track">
-            <div class="swipe-handle" id="swipe-handle">
-              <i class="fa-solid fa-chevron-right"></i>
-            </div>
-            <span class="swipe-text">Geser ke kanan untuk membuka</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Bottom Decorative Border -->
-      <div class="decor-bottom"></div>
-    </div>
-
     <!-- MAIN WEDDING SCREEN (Section 1 - Centered Card over bg.jpg Background) -->
-    <div id="wedding-screen" class="screen hidden-screen">
+    <div id="wedding-screen" class="screen active active-wedding">
 
       <!-- Floating Corner Ribbon Ornaments -->
       <img src="ornamen1.png" alt="Ribbon TL" class="corner-ribbon ribbon-tl">
@@ -447,7 +411,7 @@
   </div>
 
   <!-- Custom JS -->
-  <script src="script.js?v=1.5"></script>
+  <script src="script.js?v=1.6"></script>
 </body>
 
 </html>
