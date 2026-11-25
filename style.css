@@ -66,11 +66,19 @@ html, body {
   max-width: 440px;
   max-height: 900px;
   aspect-ratio: 9 / 19.5;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 0 10px rgba(255, 255, 255, 0.03);
   border-radius: 20px;
   background-color: var(--color-bg-deep);
-  transition: transform var(--transition-medium);
+}
+
+#app::-webkit-scrollbar {
+  display: none;
 }
 
 /* Fullscreen on actual mobile screens */
@@ -85,29 +93,30 @@ html, body {
     border-radius: 0;
     box-shadow: none;
     aspect-ratio: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 }
 
 /* ==========================================================================
-   COMMON SCREEN STYLING
+   COMMON SCREEN STYLING (Continuous Vertical Scroll)
    ========================================================================== */
 .screen {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: relative;
   width: 100%;
-  height: 100%;
+  min-height: 100vh;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   z-index: 10;
-  transition: transform var(--transition-slow), opacity var(--transition-slow);
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .hidden-screen {
-  opacity: 0;
-  pointer-events: none;
+  display: flex;
 }
 
 /* ==========================================================================
@@ -767,7 +776,7 @@ html, body {
    MUSIC BUTTON
    ========================================================================== */
 .music-btn {
-  position: absolute;
+  position: fixed;
   bottom: 25px;
   right: 25px;
   width: 46px;
@@ -776,7 +785,7 @@ html, body {
   background: var(--gold-gradient);
   border: none;
   cursor: pointer;
-  z-index: 50;
+  z-index: 9999;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -915,8 +924,8 @@ html, body {
 
 /* Clockwise sweep drawing animation */
 .active-arrum .frame-overlay {
-  animation: paintFrame 2.8s cubic-bezier(0.25, 1, 0.5, 1) forwards,
-             floatFrame 8s ease-in-out infinite alternate 2.8s;
+  animation: paintFrame 1.4s cubic-bezier(0.25, 1, 0.5, 1) forwards,
+             floatFrame 8s ease-in-out infinite alternate 1.4s;
 }
 
 @keyframes paintFrame {
@@ -1012,15 +1021,15 @@ html, body {
 
 /* Sequential Reveals after Frame is Painted */
 .active-arrum .animate-paint-1 {
-  animation: revealCrest 1.2s cubic-bezier(0.25, 1, 0.5, 1) 2.6s forwards;
+  animation: revealCrest 0.9s cubic-bezier(0.25, 1, 0.5, 1) 0.2s forwards;
 }
 
 .active-arrum .animate-paint-2 {
-  animation: revealVerse 1.4s cubic-bezier(0.25, 1, 0.5, 1) 3.3s forwards;
+  animation: revealVerse 1.1s cubic-bezier(0.25, 1, 0.5, 1) 0.4s forwards;
 }
 
 .active-arrum .animate-paint-3 {
-  animation: revealCitation 1.2s cubic-bezier(0.25, 1, 0.5, 1) 3.9s forwards;
+  animation: revealCitation 0.9s cubic-bezier(0.25, 1, 0.5, 1) 0.6s forwards;
 }
 
 @keyframes revealCrest {
@@ -1140,11 +1149,17 @@ html, body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  z-index: 13; /* Higher than arrum screen to stack correctly */
+  z-index: 13;
   overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 640px;
+  max-height: 900px;
+  box-sizing: border-box;
 }
 
 #couple-screen.active-couple {
@@ -1165,12 +1180,11 @@ html, body {
   background-position: center;
   pointer-events: none;
   z-index: 5;
-  clip-path: polygon(50% 50%, 50% 0, 50% 0, 50% 0, 50% 0, 50% 0); /* Hidden initially */
+  opacity: 1;
 }
 
-/* Clockwise sweep drawing animation */
 .active-couple .couple-frame-overlay {
-  animation: paintFrame 2.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation: paintFrame 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 /* Content Container (Vertical Stack of Rows) */
@@ -1180,93 +1194,105 @@ html, body {
   justify-content: space-between;
   align-items: stretch;
   width: 90%;
-  height: 82%;
+  height: 84%;
+  min-height: 520px;
+  max-height: 720px;
   z-index: 6;
   position: relative;
-  padding: 10px 0;
+  padding: 15px 0;
+  box-sizing: border-box;
 }
 
 /* Mempelai Row Layout */
 .mempelai-row {
   display: flex;
   flex-direction: row;
-  align-items: stretch; /* Stretch to fill full half height of container */
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
-  height: 50%; /* Each row takes exactly half container height */
+  height: 48%;
+  min-height: 240px;
   position: relative;
+  box-sizing: border-box;
 }
 
-/* Mempelai Photo Box-less / Background-less PNG Container (Absolute Positioned for Size) */
+/* Mempelai Photo Box-less / Background-less PNG Container */
 .mempelai-photo-block {
-  height: 98%; /* Adjusted to leave a small gap and avoid overlapping the frame */
-  width: 44%; /* Balanced width to guarantee separation from text block */
-  max-width: 145px; /* Equal sizing for both groom and bride photos */
-  opacity: 0;
-  will-change: transform, opacity;
+  height: 100%;
+  max-height: 270px;
+  min-height: 200px;
+  width: 44%;
+  max-width: 155px;
+  opacity: 1;
   position: absolute;
   top: 0;
   bottom: 0;
   margin: auto 0;
   z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
 }
 
 .groom-photo {
-  left: 15px; /* Shifted inside the left border */
+  left: 12px;
 }
 
 .bride-photo {
-  right: 15px; /* Shifted inside the right border */
+  right: 12px;
 }
 
 .mempelai-png-photo {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* Fit inside the block without cropping */
+  object-fit: contain;
+  object-position: center bottom;
   display: block;
-  filter: drop-shadow(0 8px 16px rgba(88, 17, 26, 0.22)); /* Contour shadow */
+  filter: drop-shadow(0 8px 16px rgba(88, 17, 26, 0.22));
   border: none;
   background: transparent;
   box-shadow: none;
 }
 
-/* Mempelai Info Blocks (positioned absolutely next to photos) */
+/* Mempelai Info Blocks (positioned opposite photo) */
 .mempelai-info-block {
-  width: 48%; /* Reduced from 54% to guarantee separation from photo block */
+  width: 50%;
+  max-width: 200px;
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
   z-index: 3;
-  opacity: 0;
+  opacity: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
 .groom-info {
-  right: 15px; /* Aligned inside the right frame boundary */
+  right: 12px;
   text-align: left;
   align-items: flex-start;
 }
 
 .bride-info {
-  left: 15px; /* Aligned inside the left frame boundary */
+  left: 12px;
   text-align: right;
   align-items: flex-end;
 }
 
 .mempelai-name {
   font-family: 'Fredoka', sans-serif;
-  font-size: 1.05rem; /* Sized down slightly to fit on narrow screens without wrapping */
-  font-weight: 600;
+  font-size: 1.15rem;
+  font-weight: 700;
   color: var(--color-maroon-bright);
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.95), 0 2px 4px rgba(88, 17, 26, 0.1);
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   line-height: 1.25;
 }
 
 .mempelai-parents {
   font-family: 'Caveat', cursive;
-  font-size: 0.98rem; /* Sized down slightly for cursive readability in narrow column */
+  font-size: 1.05rem;
   font-weight: 700;
   color: var(--color-maroon-base);
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.95);
@@ -1291,7 +1317,7 @@ html, body {
 }
 
 .sep-line {
-  width: 50px;
+  width: 45px;
   height: 1.2px;
 }
 
@@ -1318,160 +1344,78 @@ html, body {
   }
 }
 
-/* Staggered Corner Walk Entrance Animations */
+/* Smooth Responsive Entrance Animations */
 .active-couple .groom-photo-anim {
-  animation: slideGroomCorner 4.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: glideGroom 0.9s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 .active-couple .bride-photo-anim {
-  animation: slideBrideCorner 4.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: glideBride 0.9s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
-@keyframes slideGroomCorner {
+.active-couple .groom-info {
+  animation: glideGroomInfo 0.9s cubic-bezier(0.25, 1, 0.5, 1) 0.12s forwards;
+}
+
+.active-couple .bride-info {
+  animation: glideBrideInfo 0.9s cubic-bezier(0.25, 1, 0.5, 1) 0.12s forwards;
+}
+
+@keyframes glideGroom {
   0% {
     opacity: 0;
-    transform: translateX(calc(min(90vw, 396px) - 100% - 30px)) translateY(0) scaleX(1);
-    animation-timing-function: linear;
-  }
-  15% {
-    opacity: 1;
-    transform: translateX(calc((min(90vw, 396px) - 100% - 30px) * 0.8)) translateY(-8px) scaleX(1);
-    animation-timing-function: linear;
-  }
-  30% {
-    opacity: 1;
-    transform: translateX(calc((min(90vw, 396px) - 100% - 30px) * 0.6)) translateY(0) scaleX(1);
-    animation-timing-function: linear;
-  }
-  45% {
-    opacity: 1;
-    transform: translateX(calc((min(90vw, 396px) - 100% - 30px) * 0.4)) translateY(-8px) scaleX(1);
-    animation-timing-function: linear;
-  }
-  60% {
-    opacity: 1;
-    transform: translateX(calc((min(90vw, 396px) - 100% - 30px) * 0.2)) translateY(0) scaleX(1);
-    animation-timing-function: linear;
-  }
-  75% {
-    opacity: 1;
-    transform: translateX(0) translateY(0) scaleX(1);
-    animation-timing-function: ease-in-out;
-  }
-  85% {
-    opacity: 1;
-    transform: translateX(0) translateY(0) scaleX(-0.1); /* Mirroring flip squeeze */
-    animation-timing-function: ease-in-out;
-  }
-  95%, 100% {
-    opacity: 1;
-    transform: translateX(0) translateY(0) scaleX(-1); /* Settles mirrored */
-  }
-}
-
-@keyframes slideBrideCorner {
-  0% {
-    opacity: 0;
-    transform: translateX(calc(100% + 30px - min(90vw, 396px))) translateY(0) scaleX(1);
-    animation-timing-function: linear;
-  }
-  15% {
-    opacity: 1;
-    transform: translateX(calc((100% + 30px - min(90vw, 396px)) * 0.8)) translateY(-8px) scaleX(1);
-    animation-timing-function: linear;
-  }
-  30% {
-    opacity: 1;
-    transform: translateX(calc((100% + 30px - min(90vw, 396px)) * 0.6)) translateY(0) scaleX(1);
-    animation-timing-function: linear;
-  }
-  45% {
-    opacity: 1;
-    transform: translateX(calc((100% + 30px - min(90vw, 396px)) * 0.4)) translateY(-8px) scaleX(1);
-    animation-timing-function: linear;
-  }
-  60% {
-    opacity: 1;
-    transform: translateX(calc((100% + 30px - min(90vw, 396px)) * 0.2)) translateY(0) scaleX(1);
-    animation-timing-function: linear;
-  }
-  75% {
-    opacity: 1;
-    transform: translateX(0) translateY(0) scaleX(1);
-    animation-timing-function: ease-in-out;
-  }
-  85% {
-    opacity: 1;
-    transform: translateX(0) translateY(0) scaleX(-0.1); /* Mirroring flip squeeze */
-    animation-timing-function: ease-in-out;
-  }
-  95%, 100% {
-    opacity: 1;
-    transform: translateX(0) translateY(0) scaleX(-1); /* Settles mirrored */
-  }
-}
-
-/* Mempelai Info Blocks Reveal starts exactly as mirroring flip begins */
-.active-couple .mempelai-info-block {
-  animation: revealInfoBlock 1.5s ease-out 3.1s forwards;
-}
-
-@keyframes revealInfoBlock {
-  0% {
-    opacity: 0;
-    transform: translateY(12px);
+    transform: translateX(-35px) scale(0.96);
   }
   100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(0) scale(1);
   }
 }
 
-/* In-place Tilting/Skewing Animations (Bergerak di tempat - sudut saja) */
+@keyframes glideBride {
+  0% {
+    opacity: 0;
+    transform: translateX(35px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes glideGroomInfo {
+  0% {
+    opacity: 0;
+    transform: translateY(-50%) translateX(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+}
+
+@keyframes glideBrideInfo {
+  0% {
+    opacity: 0;
+    transform: translateY(-50%) translateX(-30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+}
+
+/* Subtle In-place Tilting/Swaying */
 .active-couple .mempelai-png-photo {
-  animation: skewPhoto 2.8s ease-in-out infinite alternate 3.8s;
+  animation: subtleSwayPhoto 4s ease-in-out infinite alternate 1.2s;
 }
 
-@keyframes skewPhoto {
+@keyframes subtleSwayPhoto {
   0% {
-    transform: rotate(-1.8deg) skewX(-1deg);
+    transform: rotate(-1deg);
   }
   100% {
-    transform: rotate(1.8deg) skewX(1deg);
-  }
-}
-
-/* Groom Text Tilting */
-.active-couple .groom-info .mempelai-name,
-.active-couple .groom-info .mempelai-parents {
-  animation: skewTextGroom 2.4s ease-in-out infinite alternate 5.3s;
-}
-
-@keyframes skewTextGroom {
-  0% {
-    transform: rotate(-1deg) skewX(-0.6deg);
-    transform-origin: left center;
-  }
-  100% {
-    transform: rotate(1deg) skewX(0.6deg);
-    transform-origin: left center;
-  }
-}
-
-/* Bride Text Tilting */
-.active-couple .bride-info .mempelai-name,
-.active-couple .bride-info .mempelai-parents {
-  animation: skewTextBride 2.4s ease-in-out infinite alternate 5.3s;
-}
-
-@keyframes skewTextBride {
-  0% {
-    transform: rotate(-1deg) skewX(-0.6deg);
-    transform-origin: right center;
-  }
-  100% {
-    transform: rotate(1deg) skewX(0.6deg);
-    transform-origin: right center;
+    transform: rotate(1deg);
   }
 }
 
@@ -1485,13 +1429,7 @@ html, body {
   display: flex;
   justify-content: center;
   align-items: center;
-  opacity: 0;
-}
-
-/* Fade in the ornaments slowly when the screen becomes active */
-.active-couple .couple-decor-wrapper {
   opacity: 0.9;
-  transition: opacity 1.2s ease 2.0s;
 }
 
 .decor-top-pos {
@@ -1625,14 +1563,14 @@ html, body {
   transform: translate(-50%, -50%);
   z-index: 1; /* Sits behind text (z-index 3) and photos (z-index 2) */
   pointer-events: none;
-  opacity: 0;
+  opacity: 0.9;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .active-couple .couple-center-decor {
-  animation: revealCenterDecor 1.8s ease-out 2.2s forwards;
+  animation: revealCenterDecor 1.2s ease-out 0.6s forwards;
 }
 
 @keyframes revealCenterDecor {
@@ -1708,8 +1646,8 @@ html, body {
 
 /* Clockwise sweep drawing animation & Beat pulse */
 #schedule-screen.active-schedule:not(.exit-schedule-back) .schedule-frame-overlay {
-  animation: paintFrame 2.8s cubic-bezier(0.25, 1, 0.5, 1) forwards,
-             beatFrame 0.75s ease-in-out infinite 4.2s;
+  animation: paintFrame 1.4s cubic-bezier(0.25, 1, 0.5, 1) forwards,
+             beatFrame 0.75s ease-in-out infinite 2.0s;
 }
 
 /* Content Container */
@@ -2265,12 +2203,12 @@ html, body {
 
 /* Entrance & Beat Animations triggers - Unique animations per card */
 #schedule-screen.active-schedule:not(.exit-schedule-back) .animate-schedule-countdown {
-  animation: revealCountdown 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.5s forwards;
+  animation: revealCountdown 1.0s cubic-bezier(0.25, 1, 0.5, 1) 0.2s forwards;
 }
 
 /* Single Resepsi Card Entry: Elegant Zoom & Reveal */
 .active-schedule .animate-card-single {
-  animation: revealSingleCard 1.5s cubic-bezier(0.25, 1, 0.5, 1) 0.6s forwards;
+  animation: revealSingleCard 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.4s forwards;
 }
 
 @keyframes revealSingleCard {
@@ -3085,8 +3023,8 @@ html, body {
 }
 
 #gift-screen.active-gift:not(.exit-gift-back) .gift-frame-overlay {
-  animation: paintFrame 2.8s cubic-bezier(0.25, 1, 0.5, 1) forwards,
-             beatFrame 0.75s ease-in-out infinite 4.2s;
+  animation: paintFrame 1.4s cubic-bezier(0.25, 1, 0.5, 1) forwards,
+             beatFrame 0.75s ease-in-out infinite 2.0s;
 }
 
 /* Content Container */

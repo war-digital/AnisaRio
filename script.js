@@ -44,18 +44,10 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
       btnOpenInvitation.style.transform = '';
       
-      // Transition to Ar-Rum Screen (Fade out wedding screen, fade in arrum screen)
-      weddingScreen.classList.add('fade-out-screen');
-      
-      setTimeout(() => {
-        weddingScreen.classList.add('hidden-screen');
-        weddingScreen.classList.remove('active-wedding');
-        weddingScreen.classList.remove('fade-out-screen');
-        
-        arrumScreen.classList.remove('hidden-screen');
-        void arrumScreen.offsetWidth; // Trigger reflow for animation
-        arrumScreen.classList.add('active-arrum');
-      }, 800); // Match CSS fade-out transition duration
+      // Smoothly scroll down to Ar-Rum section
+      arrumScreen.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setTimeout(handleScroll, 200);
+      setTimeout(handleScroll, 500);
     }, 150);
 
     // Create a beautiful, premium toast notification
@@ -106,393 +98,65 @@ document.addEventListener('DOMContentLoaded', () => {
   musicToggle.addEventListener('click', toggleMusic);
 
   /* ==========================================================================
-     SCROLL/SWIPE TO SECTION 2 (COUPLE DETAILS SCREEN) & REVERSIBLE NAVIGATION
+     SCROLL OBSERVER & ANIMATION TRIGGERS (Free Scrolling)
      ========================================================================== */
-  let isTransitioningArrum = false;
-  let isTransitioningCouple = false;
-  let touchStartY = 0;
-  let touchStartCoupleY = 0;
+  const appContainer = document.getElementById('app');
 
-  // 1. Section 1 (Ar-Rum) -> Section 2 (Couple Details) (Move Forward)
-  function triggerArrumExit() {
-    if (isTransitioningArrum) return;
-    isTransitioningArrum = true;
-
-    // Trigger exit animations for Section 1 elements
-    arrumScreen.classList.add('exit-arrum');
-
-    setTimeout(() => {
-      // Hide Section 1
-      arrumScreen.classList.add('hidden-screen');
-      arrumScreen.classList.remove('active-arrum');
-      arrumScreen.classList.remove('exit-arrum');
-
-      // Show Section 2
-      coupleScreen.classList.remove('hidden-screen');
-      void coupleScreen.offsetWidth; // Force reflow to trigger animations
-      coupleScreen.classList.add('active-couple');
-
-      isTransitioningArrum = false;
-    }, 800); // 800ms exit animation duration
+  function activateScreen(screen) {
+    if (!screen) return;
+    const id = screen.id;
+    if (id === 'wedding-screen') screen.classList.add('active-wedding');
+    else if (id === 'arrum-screen') screen.classList.add('active-arrum');
+    else if (id === 'couple-screen') screen.classList.add('active-couple');
+    else if (id === 'schedule-screen') screen.classList.add('active-schedule');
+    else if (id === 'gift-screen') screen.classList.add('active-gift');
+    else if (id === 'wishes-screen') screen.classList.add('active-wishes');
+    else if (id === 'thankyou-screen') screen.classList.add('active-thankyou');
   }
 
-  // 2. Section 1 (Ar-Rum) -> Wedding Details Screen (Move Backward)
-  function triggerArrumExitBack() {
-    if (isTransitioningArrum) return;
-    isTransitioningArrum = true;
+  // Activate wedding screen immediately
+  weddingScreen.classList.add('active-wedding');
 
-    // Trigger exit-back animations for Section 1 elements (slide down)
-    arrumScreen.classList.add('exit-arrum-back');
+  // IntersectionObserver to activate sections when scrolled into view
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          activateScreen(entry.target);
+        }
+      });
+    }, {
+      root: null,
+      threshold: 0.12
+    });
 
-    setTimeout(() => {
-      // Hide Section 1
-      arrumScreen.classList.add('hidden-screen');
-      arrumScreen.classList.remove('active-arrum');
-      arrumScreen.classList.remove('exit-arrum-back');
-
-      // Show Wedding Screen
-      weddingScreen.classList.remove('hidden-screen');
-      void weddingScreen.offsetWidth;
-      weddingScreen.classList.add('active-wedding');
-
-      isTransitioningArrum = false;
-    }, 800);
+    document.querySelectorAll('.screen').forEach(screen => {
+      observer.observe(screen);
+    });
   }
 
-  // 3. Section 2 (Couple Details) -> Section 1 (Ar-Rum) (Move Backward)
-  function triggerCoupleExitBack() {
-    if (isTransitioningCouple) return;
-    isTransitioningCouple = true;
-
-    // Trigger Section 2 custom split-slide exit animations
-    coupleScreen.classList.add('exit-couple');
-
-    setTimeout(() => {
-      // Hide Section 2
-      coupleScreen.classList.add('hidden-screen');
-      coupleScreen.classList.remove('active-couple');
-      coupleScreen.classList.remove('exit-couple');
-
-      // Show Section 1
-      arrumScreen.classList.remove('hidden-screen');
-      void arrumScreen.offsetWidth;
-      arrumScreen.classList.add('active-arrum');
-
-      isTransitioningCouple = false;
-    }, 800);
+  // Scroll listener for smooth triggering on container scroll
+  function handleScroll() {
+    const vh = window.innerHeight;
+    document.querySelectorAll('.screen').forEach(screen => {
+      const rect = screen.getBoundingClientRect();
+      if (rect.top < vh * 0.88 && rect.bottom > vh * 0.1) {
+        activateScreen(screen);
+      }
+    });
   }
 
-  // 4. Section 2 (Couple Details) -> Section 3 (Schedule) (Move Forward)
-  function triggerCoupleExit() {
-    if (isTransitioningCouple) return;
-    isTransitioningCouple = true;
-
-    // Trigger Section 2 exit animations
-    coupleScreen.classList.add('exit-couple');
-
-    setTimeout(() => {
-      // Hide Section 2
-      coupleScreen.classList.add('hidden-screen');
-      coupleScreen.classList.remove('active-couple');
-      coupleScreen.classList.remove('exit-couple');
-
-      // Show Section 3
-      scheduleScreen.classList.remove('hidden-screen');
-      void scheduleScreen.offsetWidth; // Force reflow
-      scheduleScreen.classList.add('active-schedule');
-
-      isTransitioningCouple = false;
-    }, 800);
+  if (appContainer) {
+    appContainer.addEventListener('scroll', handleScroll, { passive: true });
   }
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  // Initial activation check
+  handleScroll();
 
-  let isTransitioningSchedule = false;
-
-  // 5. Section 3 (Schedule) -> Section 2 (Couple Details) (Move Backward)
-  function triggerScheduleExitBack() {
-    if (isTransitioningSchedule) return;
-    isTransitioningSchedule = true;
-
-    // Trigger Section 3 exit-back animations
-    scheduleScreen.classList.add('exit-schedule-back');
-
-    setTimeout(() => {
-      // Hide Section 3
-      scheduleScreen.classList.add('hidden-screen');
-      scheduleScreen.classList.remove('active-schedule');
-      scheduleScreen.classList.remove('exit-schedule-back');
-
-      // Show Section 2
-      coupleScreen.classList.remove('hidden-screen');
-      void coupleScreen.offsetWidth;
-      coupleScreen.classList.add('active-couple');
-
-      isTransitioningSchedule = false;
-    }, 800);
-  }
-
-  // 6. Section 3 (Schedule) -> Section 5 (Wedding Gift) (Move Forward)
-  function triggerScheduleExit() {
-    if (isTransitioningSchedule) return;
-    isTransitioningSchedule = true;
-
-    // Trigger Section 3 exit forward animations
-    scheduleScreen.classList.add('exit-schedule');
-
-    setTimeout(() => {
-      // Hide Section 3
-      scheduleScreen.classList.add('hidden-screen');
-      scheduleScreen.classList.remove('active-schedule');
-      scheduleScreen.classList.remove('exit-schedule');
-
-      // Show Section 5
-      giftScreen.classList.remove('hidden-screen');
-      void giftScreen.offsetWidth;
-      giftScreen.classList.add('active-gift');
-
-      isTransitioningSchedule = false;
-    }, 800);
-  }
-
-  let isTransitioningGift = false;
-
-  // 7. Section 5 (Wedding Gift) -> Section 3 (Schedule) (Move Backward)
-  function triggerGiftExitBack() {
-    if (isTransitioningGift) return;
-    isTransitioningGift = true;
-
-    // Trigger Section 5 exit-back animations
-    giftScreen.classList.add('exit-gift-back');
-
-    setTimeout(() => {
-      // Hide Section 5
-      giftScreen.classList.add('hidden-screen');
-      giftScreen.classList.remove('active-gift');
-      giftScreen.classList.remove('exit-gift-back');
-
-      // Show Section 3
-      scheduleScreen.classList.remove('hidden-screen');
-      void scheduleScreen.offsetWidth;
-      scheduleScreen.classList.add('active-schedule');
-
-      isTransitioningGift = false;
-    }, 800);
-  }
-
-  // 10. Section 5 (Wedding Gift) -> Section 6 (Wishes) (Move Forward)
-  function triggerGiftExit() {
-    if (isTransitioningGift) return;
-    isTransitioningGift = true;
-
-    // Trigger Section 5 exit forward animations
-    giftScreen.classList.add('exit-gift');
-
-    setTimeout(() => {
-      // Hide Section 5
-      giftScreen.classList.add('hidden-screen');
-      giftScreen.classList.remove('active-gift');
-      giftScreen.classList.remove('exit-gift');
-
-      // Show Section 6
-      wishesScreen.classList.remove('hidden-screen');
-      void wishesScreen.offsetWidth;
-      wishesScreen.classList.add('active-wishes');
-
-      isTransitioningGift = false;
-    }, 800);
-  }
-
-  let isTransitioningWishes = false;
-
-  // 11. Section 6 (Wishes) -> Section 5 (Wedding Gift) (Move Backward)
-  function triggerWishesExitBack() {
-    if (isTransitioningWishes) return;
-    isTransitioningWishes = true;
-
-    // Trigger Section 6 exit-back animations
-    wishesScreen.classList.add('exit-wishes-back');
-
-    setTimeout(() => {
-      // Hide Section 6
-      wishesScreen.classList.add('hidden-screen');
-      wishesScreen.classList.remove('active-wishes');
-      wishesScreen.classList.remove('exit-wishes-back');
-
-      // Show Section 5
-      giftScreen.classList.remove('hidden-screen');
-      void giftScreen.offsetWidth;
-      giftScreen.classList.add('active-gift');
-
-      isTransitioningWishes = false;
-    }, 800);
-  }
-
-  // 12. Section 6 (Wishes) -> Section 7 (Thank You) (Move Forward)
-  function triggerWishesExit() {
-    if (isTransitioningWishes) return;
-    isTransitioningWishes = true;
-
-    // Trigger Section 6 exit forward animations
-    wishesScreen.classList.add('exit-wishes');
-
-    setTimeout(() => {
-      // Hide Section 6
-      wishesScreen.classList.add('hidden-screen');
-      wishesScreen.classList.remove('active-wishes');
-      wishesScreen.classList.remove('exit-wishes');
-
-      // Show Section 7
-      thankyouScreen.classList.remove('hidden-screen');
-      void thankyouScreen.offsetWidth;
-      thankyouScreen.classList.add('active-thankyou');
-
-      isTransitioningWishes = false;
-    }, 800);
-  }
-
-  let isTransitioningThankyou = false;
-
-  // 13. Section 7 (Thank You) -> Section 6 (Wishes) (Move Backward)
-  function triggerThankyouExitBack() {
-    if (isTransitioningThankyou) return;
-    isTransitioningThankyou = true;
-
-    // Trigger Section 7 exit-back animations
-    thankyouScreen.classList.add('exit-thankyou-back');
-
-    setTimeout(() => {
-      // Hide Section 7
-      thankyouScreen.classList.add('hidden-screen');
-      thankyouScreen.classList.remove('active-thankyou');
-      thankyouScreen.classList.remove('exit-thankyou-back');
-
-      // Show Section 6
-      wishesScreen.classList.remove('hidden-screen');
-      void wishesScreen.offsetWidth;
-      wishesScreen.classList.add('active-wishes');
-
-      isTransitioningThankyou = false;
-    }, 800);
-  }
-
-  // --- Section 1 (Ar-Rum) Interaction Listeners ---
-  arrumScreen.addEventListener('wheel', (e) => {
-    if (e.deltaY > 0) {
-      triggerArrumExit(); // Scroll down -> Go forward
-    } else if (e.deltaY < 0) {
-      triggerArrumExitBack(); // Scroll up -> Go backward
-    }
-  }, { passive: true });
-
-  arrumScreen.addEventListener('touchstart', (e) => {
-    touchStartY = e.touches[0].clientY;
-  }, { passive: true });
-
-  arrumScreen.addEventListener('touchend', (e) => {
-    const touchEndY = e.changedTouches[0].clientY;
-    const diffY = touchStartY - touchEndY;
-    if (diffY > 50) {
-      triggerArrumExit(); // Swipe up -> Go forward
-    } else if (diffY < -50) {
-      triggerArrumExitBack(); // Swipe down -> Go backward
-    }
-  }, { passive: true });
-
-  // --- Section 2 (Couple Details) Interaction Listeners ---
-  coupleScreen.addEventListener('wheel', (e) => {
-    if (e.deltaY > 0) {
-      triggerCoupleExit(); // Scroll down -> Go forward
-    } else if (e.deltaY < 0) {
-      triggerCoupleExitBack(); // Scroll up -> Go backward
-    }
-  }, { passive: true });
-
-  coupleScreen.addEventListener('touchstart', (e) => {
-    touchStartCoupleY = e.touches[0].clientY;
-  }, { passive: true });
-
-  coupleScreen.addEventListener('touchend', (e) => {
-    const touchEndY = e.changedTouches[0].clientY;
-    const diffY = touchStartCoupleY - touchEndY;
-    if (diffY > 50) {
-      triggerCoupleExit(); // Swipe up -> Go forward
-    } else if (diffY < -50) {
-      triggerCoupleExitBack(); // Swipe down -> Go backward
-    }
-  }, { passive: true });
-
-  // --- Section 3 (Schedule) Interaction Listeners ---
-  const scheduleCardsContainer = document.querySelector('.schedule-cards');
-  let touchStartScheduleY = 0;
-
-  scheduleScreen.addEventListener('touchstart', (e) => {
-    touchStartScheduleY = e.touches[0].clientY;
-  }, { passive: true });
-
-  scheduleScreen.addEventListener('touchend', (e) => {
-    const touchEndY = e.changedTouches[0].clientY;
-    const diffY = touchStartScheduleY - touchEndY;
-    const isScrollAtBottom = scheduleCardsContainer.scrollHeight - scheduleCardsContainer.scrollTop <= scheduleCardsContainer.clientHeight + 5;
-    
-    // Go backward if swiping down AND the cards list is scrolled to the top
-    if (diffY < -50 && scheduleCardsContainer.scrollTop === 0) {
-      triggerScheduleExitBack(); // Swipe down -> Go backward
-    }
-    // Go forward if swiping up AND the cards list is scrolled to the bottom
-    else if (diffY > 50 && isScrollAtBottom) {
-      triggerScheduleExit(); // Swipe up -> Go forward
-    }
-  }, { passive: true });
-
-  scheduleScreen.addEventListener('wheel', (e) => {
-    const isScrollAtBottom = scheduleCardsContainer.scrollHeight - scheduleCardsContainer.scrollTop <= scheduleCardsContainer.clientHeight + 5;
-    
-    // Go backward if scrolling up AND the cards list is scrolled to the top
-    if (e.deltaY < 0 && scheduleCardsContainer.scrollTop === 0) {
-      triggerScheduleExitBack(); // Scroll up -> Go backward
-    }
-    // Go forward if scrolling down AND the cards list is scrolled to the bottom
-    else if (e.deltaY > 0 && isScrollAtBottom) {
-      triggerScheduleExit(); // Scroll down -> Go forward
-    }
-  }, { passive: true });
-
-
-
-  // --- Section 5 (Wedding Gift) Interaction Listeners ---
-  const giftCardsContainer = document.querySelector('.gift-cards');
-  let touchStartGiftY = 0;
-
-  giftScreen.addEventListener('touchstart', (e) => {
-    touchStartGiftY = e.touches[0].clientY;
-  }, { passive: true });
-
-  giftScreen.addEventListener('touchend', (e) => {
-    const touchEndY = e.changedTouches[0].clientY;
-    const diffY = touchStartGiftY - touchEndY;
-    const isScrollAtTop = !giftCardsContainer || giftCardsContainer.scrollTop === 0;
-    const isScrollAtBottom = !giftCardsContainer || (giftCardsContainer.scrollHeight - giftCardsContainer.scrollTop <= giftCardsContainer.clientHeight + 5);
-    
-    // Go backward if swiping down AND the gift list is scrolled to the top
-    if (diffY < -50 && isScrollAtTop) {
-      triggerGiftExitBack(); // Swipe down -> Go backward
-    }
-    // Go forward if swiping up AND the gift list is scrolled to the bottom
-    else if (diffY > 50 && isScrollAtBottom) {
-      triggerGiftExit(); // Swipe up -> Go forward
-    }
-  }, { passive: true });
-
-  giftScreen.addEventListener('wheel', (e) => {
-    const isScrollAtTop = !giftCardsContainer || giftCardsContainer.scrollTop === 0;
-    const isScrollAtBottom = !giftCardsContainer || (giftCardsContainer.scrollHeight - giftCardsContainer.scrollTop <= giftCardsContainer.clientHeight + 5);
-    
-    // Go backward if scrolling up AND the gift list is scrolled to the top
-    if (e.deltaY < 0 && isScrollAtTop) {
-      triggerGiftExitBack(); // Scroll up -> Go backward
-    }
-    // Go forward if scrolling down AND the gift list is scrolled to the bottom
-    else if (e.deltaY > 0 && isScrollAtBottom) {
-      triggerGiftExit(); // Scroll down -> Go forward
+  // Desktop mousewheel support: if wheel occurs outside #app, forward to #app
+  window.addEventListener('wheel', (e) => {
+    if (appContainer && !appContainer.contains(e.target)) {
+      appContainer.scrollTop += e.deltaY;
     }
   }, { passive: true });
 
@@ -522,68 +186,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   });
-
-  // --- Section 6 (Wishes & RSVP) Interaction Listeners ---
-  const wishesListContainer = document.getElementById('wishes-list');
-  let touchStartWishesY = 0;
-
-  wishesScreen.addEventListener('touchstart', (e) => {
-    touchStartWishesY = e.touches[0].clientY;
-  }, { passive: true });
-
-  wishesScreen.addEventListener('touchend', (e) => {
-    const touchEndY = e.changedTouches[0].clientY;
-    const diffY = touchStartWishesY - touchEndY;
-    const isScrollAtTop = !wishesListContainer || wishesListContainer.scrollTop === 0;
-    const isScrollAtBottom = !wishesListContainer || (wishesListContainer.scrollHeight - wishesListContainer.scrollTop <= wishesListContainer.clientHeight + 5);
-    
-    // Go backward if swiping down AND the wishes list is scrolled to the top
-    if (diffY < -50 && isScrollAtTop) {
-      triggerWishesExitBack(); // Swipe down -> Go backward
-    }
-    // Go forward if swiping up AND the wishes list is scrolled to the bottom
-    else if (diffY > 50 && isScrollAtBottom) {
-      triggerWishesExit(); // Swipe up -> Go forward
-    }
-  }, { passive: true });
-
-  wishesScreen.addEventListener('wheel', (e) => {
-    const isScrollAtTop = !wishesListContainer || wishesListContainer.scrollTop === 0;
-    const isScrollAtBottom = !wishesListContainer || (wishesListContainer.scrollHeight - wishesListContainer.scrollTop <= wishesListContainer.clientHeight + 5);
-    
-    // Go backward if scrolling up AND the wishes list is scrolled to the top
-    if (e.deltaY < 0 && isScrollAtTop) {
-      triggerWishesExitBack(); // Scroll up -> Go backward
-    }
-    // Go forward if scrolling down AND the wishes list is scrolled to the bottom
-    else if (e.deltaY > 0 && isScrollAtBottom) {
-      triggerWishesExit(); // Scroll down -> Go forward
-    }
-  }, { passive: true });
-
-  // --- Section 7 (Thank You) Interaction Listeners ---
-  let touchStartThankyouY = 0;
-
-  thankyouScreen.addEventListener('touchstart', (e) => {
-    touchStartThankyouY = e.touches[0].clientY;
-  }, { passive: true });
-
-  thankyouScreen.addEventListener('touchend', (e) => {
-    const touchEndY = e.changedTouches[0].clientY;
-    const diffY = touchStartThankyouY - touchEndY;
-    
-    // Go backward if swiping down
-    if (diffY < -50) {
-      triggerThankyouExitBack(); // Swipe down -> Go backward
-    }
-  }, { passive: true });
-
-  thankyouScreen.addEventListener('wheel', (e) => {
-    // Go backward if scrolling up
-    if (e.deltaY < 0) {
-      triggerThankyouExitBack(); // Scroll up -> Go backward
-    }
-  }, { passive: true });
 
   // --- Wishes Board / RSVP Logic ---
   const wishesForm = document.getElementById('wishes-form');
