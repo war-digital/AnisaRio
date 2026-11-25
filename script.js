@@ -1,10 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const openingScreen = document.getElementById('opening-screen');
   const weddingScreen = document.getElementById('wedding-screen');
-  const swipeTrack = document.querySelector('.swipe-track');
-  const swipeHandle = document.getElementById('swipe-handle');
-  const swipeText = document.querySelector('.swipe-text');
-  const openingOrnament = document.querySelector('.opening-ornament');
   const bgMusic = document.getElementById('bg-music');
   const musicToggle = document.getElementById('music-toggle');
   const btnOpenInvitation = document.getElementById('btn-open-invitation');
@@ -15,20 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const giftScreen = document.getElementById('gift-screen');
   const wishesScreen = document.getElementById('wishes-screen');
   const thankyouScreen = document.getElementById('thankyou-screen');
-  
-  let isDraggingHandle = false;
-  let isDraggingScreen = false;
-  let startX = 0;
-  let currentX = 0;
-  let maxSlide = 0;
-  let hasUnlocked = false;
 
-  // Initialize bounds for slider
-  function updateBounds() {
-    maxSlide = swipeTrack.clientWidth - swipeHandle.clientWidth - 8; // 8px for 4px left/right padding
+  // Immediately activate main wedding screen as the cover
+  if (weddingScreen) {
+    weddingScreen.classList.remove('hidden-screen');
+    weddingScreen.classList.add('active', 'active-wedding');
   }
-  updateBounds();
-  window.addEventListener('resize', updateBounds);
 
   /* ==========================================================================
      GET GUEST NAME FROM URL PARAMETERS (?to=Nama+Tamu atau ?u=Nama+Tamu)
@@ -45,198 +32,11 @@ document.addEventListener('DOMContentLoaded', () => {
   loadGuestName();
 
   /* ==========================================================================
-     SWIPE HANDLE DRAGGING LOGIC
-     ========================================================================== */
-  
-  // Touch Events for Handle
-  swipeHandle.addEventListener('touchstart', (e) => {
-    if (hasUnlocked) return;
-    isDraggingHandle = true;
-    startX = e.touches[0].clientX;
-    swipeHandle.style.transition = 'none';
-    swipeText.style.transition = 'none';
-    openingOrnament.style.transition = 'none';
-  }, { passive: true });
-
-  // Mouse Events for Handle
-  swipeHandle.addEventListener('mousedown', (e) => {
-    if (hasUnlocked) return;
-    isDraggingHandle = true;
-    startX = e.clientX;
-    swipeHandle.style.transition = 'none';
-    swipeText.style.transition = 'none';
-    openingOrnament.style.transition = 'none';
-    document.body.style.userSelect = 'none';
-  });
-
-  /* ==========================================================================
-     FULL SCREEN DRAG/SWIPE LOGIC
-     ========================================================================== */
-  
-  openingScreen.addEventListener('touchstart', (e) => {
-    if (isDraggingHandle || hasUnlocked) return;
-    isDraggingScreen = true;
-    startX = e.touches[0].clientX;
-    openingScreen.style.transition = 'none';
-    openingOrnament.style.transition = 'none';
-  }, { passive: true });
-
-  openingScreen.addEventListener('mousedown', (e) => {
-    if (e.target.closest('#swipe-handle') || hasUnlocked) return;
-    isDraggingScreen = true;
-    startX = e.clientX;
-    openingScreen.style.transition = 'none';
-    openingOrnament.style.transition = 'none';
-    document.body.style.userSelect = 'none';
-  });
-
-  /* ==========================================================================
-     MOVE HANDLERS
-     ========================================================================== */
-  
-  const handleMove = (clientX) => {
-    const diff = clientX - startX;
-
-    if (isDraggingHandle) {
-      // Limit slide distance
-      let translateX = Math.max(0, Math.min(diff, maxSlide));
-      swipeHandle.style.transform = `translateX(${translateX}px)`;
-      
-      // Calculate progress
-      const progress = translateX / maxSlide;
-      swipeText.style.opacity = Math.max(0.1, 1 - progress * 1.5);
-      
-      // Pull ornament slightly as handle moves (Parallax feedback)
-      openingOrnament.style.transform = `translateX(${translateX * 0.2}px) rotate(${translateX * 0.03}deg)`;
-    } 
-    else if (isDraggingScreen) {
-      // Swipe whole screen right
-      let translateX = Math.max(0, diff);
-      openingScreen.style.transform = `translateX(${translateX}px)`;
-      
-      // Accentuate ornament pull effect
-      openingOrnament.style.transform = `translateX(${translateX * 0.15}px) rotate(${translateX * 0.02}deg)`;
-      
-      // Let wedding screen scale up slightly as cover moves
-      const progress = Math.min(translateX / window.innerWidth, 1);
-      const bgScale = 1.1 - (progress * 0.1);
-      weddingScreen.style.transform = `scale(${bgScale})`;
-      weddingScreen.style.opacity = progress;
-    }
-  };
-
-  window.addEventListener('touchmove', (e) => {
-    if (!isDraggingHandle && !isDraggingScreen) return;
-    handleMove(e.touches[0].clientX);
-  }, { passive: false });
-
-  window.addEventListener('mousemove', (e) => {
-    if (!isDraggingHandle && !isDraggingScreen) return;
-    handleMove(e.clientX);
-  });
-
-  /* ==========================================================================
-     DRAG END LOGIC
-     ========================================================================== */
-  
-  const handleEnd = (clientX) => {
-    if (!isDraggingHandle && !isDraggingScreen) return;
-    
-    const diff = clientX - startX;
-    document.body.style.userSelect = '';
-
-    if (isDraggingHandle) {
-      isDraggingHandle = false;
-      
-      // 80% to unlock
-      if (diff >= maxSlide * 0.8) {
-        unlockInvitation();
-      } else {
-        // Snap back handle, text, and ornament
-        swipeHandle.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
-        swipeText.style.transition = 'opacity 0.4s ease';
-        openingOrnament.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
-        
-        swipeHandle.style.transform = 'translateX(0)';
-        swipeText.style.opacity = '1';
-        openingOrnament.style.transform = '';
-      }
-    } 
-    else if (isDraggingScreen) {
-      isDraggingScreen = false;
-      const screenWidth = window.innerWidth;
-      
-      // 25% of screen width to unlock
-      if (diff >= screenWidth * 0.25) {
-        unlockInvitation();
-      } else {
-        // Snap back screen, ornament, and wedding background
-        openingScreen.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
-        openingOrnament.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
-        
-        openingScreen.style.transform = 'translateX(0)';
-        openingOrnament.style.transform = '';
-        
-        weddingScreen.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
-        weddingScreen.style.transform = '';
-        weddingScreen.style.opacity = '';
-      }
-    }
-  };
-
-  window.addEventListener('touchend', (e) => {
-    if (e.changedTouches && e.changedTouches.length > 0) {
-      handleEnd(e.changedTouches[0].clientX);
-    } else {
-      handleEnd(0);
-    }
-  });
-
-  window.addEventListener('mouseup', (e) => {
-    handleEnd(e.clientX);
-  });
-
-  /* ==========================================================================
-     UNLOCK & TRANSITION ACTION (Swipe Cover Unlock)
-     ========================================================================== */
-  
-  function unlockInvitation() {
-    if (hasUnlocked) return;
-    hasUnlocked = true;
-
-    // Slide out cover screen
-    openingScreen.style.transition = 'transform 0.8s cubic-bezier(0.76, 0, 0.24, 1), opacity 0.8s ease';
-    openingScreen.style.transform = 'translateX(100%)';
-    openingScreen.style.opacity = '0';
-    openingScreen.classList.add('slide-out');
-
-    // Slide/animate ornament faster to show it "pulled" away
-    openingOrnament.style.transition = 'transform 1s cubic-bezier(0.76, 0, 0.24, 1), opacity 0.8s ease';
-    openingOrnament.style.transform = 'translateX(200px) rotate(15deg)';
-    openingOrnament.style.opacity = '0';
-
-    // Show wedding screen
-    weddingScreen.classList.remove('hidden-screen');
-    weddingScreen.style.transition = 'none';
-    weddingScreen.style.transform = '';
-    weddingScreen.style.opacity = '';
-    
-    void weddingScreen.offsetWidth; // Force reflow
-    weddingScreen.classList.add('active-wedding');
-    
-    // Show music toggle (but wait for button click to ensure audio plays correctly on all devices)
-    musicToggle.classList.remove('hidden');
-
-    setTimeout(() => {
-      openingScreen.style.display = 'none';
-    }, 1000);
-  }
-
-  /* ==========================================================================
      BUKA UNDANGAN BUTTON CLICK HANDLER
      ========================================================================== */
   btnOpenInvitation.addEventListener('click', () => {
-    // 1. Play Background Music (guaranteed to play due to direct user click)
+    // 1. Show Music Toggle and Play Background Music
+    musicToggle.classList.remove('hidden');
     playMusic();
     
     // 2. Perform a beautiful open confirmation (e.g. animate button, show toast)
