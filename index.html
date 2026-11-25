@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Undangan Pernikahan - Anisa & Rio</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Great+Vibes&family=Montserrat:wght@200;300;400;600&family=Caveat:wght@400;700&family=Fredoka:wght@300;400;600&display=swap"
+    rel="stylesheet">
+
+  <!-- FontAwesome for music and interaction icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css?v=1.5">
+</head>
+
+<body>
+
+  <!-- Background Music Player -->
+  <audio id="bg-music" loop>
+    <source src="musik.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <!-- Music Toggle Button (Hidden initially, shown after unlock) -->
+  <button id="music-toggle" class="music-btn hidden">
+    <i class="fa-solid fa-compact-disc fa-spin-slow"></i>
+  </button>
+
+  <!-- Mobile Portrait Container (Portrait 6:19 / 9:19 Android Aspect Ratio) -->
+  <div id="app">
+
+    <!-- COVER / OPENING SCREEN (Light white-ivory background) -->
+    <div id="opening-screen" class="screen active">
+      <div class="white-overlay"></div>
+
+      <!-- Top Decorative Border -->
+      <div class="decor-top"></div>
+
+      <div class="opening-content">
+        <!-- Header with Title & Initials A & R -->
+        <div class="opening-header">
+          <!-- "UNDANGAN" Text (Slides in from top, deep maroon color) -->
+          <h1 class="undangan-title animate-from-top">UNDANGAN</h1>
+          <!-- Aesthetic Initials A & R (Placed right below UNDANGAN) -->
+          <div class="opening-initials">A & R</div>
+        </div>
+
+        <!-- Central Ornament (ornamen2.png) - Enlarged, clean, floats in center -->
+        <div class="ornament-container">
+          <img src="ornamen2.png" alt="Ornamen Pembuka" class="opening-ornament">
+        </div>
+
+        <!-- Swipe Right Instruction / Unlock Slider -->
+        <div class="swipe-container">
+          <div class="swipe-track">
+            <div class="swipe-handle" id="swipe-handle">
+              <i class="fa-solid fa-chevron-right"></i>
+            </div>
+            <span class="swipe-text">Geser ke kanan untuk membuka</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Decorative Border -->
+      <div class="decor-bottom"></div>
+    </div>
+
+    <!-- MAIN WEDDING SCREEN (Section 1 - Centered Card over bg.jpg Background) -->
+    <div id="wedding-screen" class="screen hidden-screen">
+
+      <!-- Floating Corner Ribbon Ornaments -->
+      <img src="ornamen1.png" alt="Ribbon TL" class="corner-ribbon ribbon-tl">
+      <img src="ornamen1.png" alt="Ribbon TR" class="corner-ribbon ribbon-tr">
+      <img src="ornamen1.png" alt="Ribbon BL" class="corner-ribbon ribbon-bl">
+      <img src="ornamen1.png" alt="Ribbon BR" class="corner-ribbon ribbon-br">
+
+      <!-- Main Column Container -->
+      <div class="wedding-container">
+
+        <!-- 1. Top text: "The Wedding Of" (Nested for Plunge + Sway) -->
+        <div class="animate-terjun-1">
+          <div class="sway-text-slow">
+            <span class="the-wedding">The Wedding Of</span>
+          </div>
+        </div>
+
+        <!-- 2. Middle: Sized-down Couple Image (Nested for Reveal + Sway) -->
+        <div class="animate-terjun-2">
+          <div class="sway-img">
+            <div class="couple-img-container">
+              <img src="bg1.png" alt="Background Pernikahan" class="couple-img">
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Bottom text: Names and details -->
+        <div class="wedding-details">
+
+          <!-- Couple Names in 1 line (Nested for Plunge + Sway) -->
+          <div class="animate-terjun-3">
+            <div class="sway-text-medium">
+              <h2 class="names-title">Anisa & Rio</h2>
+            </div>
+          </div>
+
+          <!-- Date & Location details (Nested for Plunge + Sway) -->
+          <div class="animate-terjun-4">
+            <div class="sway-text-fast">
+              <div class="save-the-date">
+                <p class="date-text">Sabtu, 05 Desember 2026</p>
+                <span class="decor-dot"></span>
+                <p class="location-text">Kelurahan Leok II</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Guest Name Container -->
+          <div class="animate-terjun-5">
+            <div class="guest-container">
+              <span class="guest-label">Kepada Yth. Bapak/Ibu/Saudara/i:</span>
+              <h3 class="guest-name" id="guest-name">Nama Tamu Undangan</h3>
+            </div>
+          </div>
+
+          <!-- Open Invitation Button -->
+          <div class="animate-terjun-6">
+            <div class="btn-container">
+              <button id="btn-open-invitation" class="btn-open">
+                <i class="fa-solid fa-envelope-open"></i> Buka Undangan
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- AR-RUM SCREEN (Section 2 - Triggered after clicking 'Buka Undangan') -->
+    <div id="arrum-screen" class="screen hidden-screen">
+
+      <!-- bg2.png transparent frame overlay -->
+      <div class="frame-overlay"></div>
+
+      <!-- Content Container -->
+      <div class="arrum-container">
+
+        <!-- Calligraphic Header / Mini crest (using ornamen3.png or ornamen4.png as small header) -->
+        <div class="arrum-crest animate-paint-1">
+          <img src="ornamen4.png" alt="Header Ornament" class="mini-crest">
+        </div>
+
+        <!-- Surah Ar-Rum Text (Cute handwriting Caveat font) -->
+        <div class="arrum-text-wrapper animate-paint-2">
+          <div class="sway-text-medium">
+            <p class="arrum-verse">
+              "Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari jenismu sendiri,
+              supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya diantaramu rasa kasih dan sayang.
+              Sesungguhnya pada yang demikian itu benar-benar terdapat tanda-tanda bagi kaum yang berpikir."
+            </p>
+          </div>
+        </div>
+
+        <!-- Citation -->
+        <div class="arrum-citation animate-paint-3">
+          <div class="sway-text-fast">
+            <p class="citation-title">QS. Ar-Rum: 21</p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- COUPLE DETAILS SCREEN (Section 2 - Triggered after scrolling Ar-Rum Screen) -->
+    <div id="couple-screen" class="screen hidden-screen">
+
+      <!-- Top Rotating Ornament -->
+      <div class="couple-decor-wrapper decor-top-pos">
+        <img src="ornamen3.png" alt="Rotating Decor Top" class="couple-decor-img spinning-ornament">
+      </div>
+
+      <!-- bg3.png transparent frame overlay -->
+      <div class="couple-frame-overlay"></div>
+
+      <!-- Center Decor Ornament (ornamen7.png) -->
+      <div class="couple-center-decor">
+        <img src="ornamen7.png" alt="Center Ornament" class="center-ornament-img">
+      </div>
+
+      <!-- Content Container (Staggered Layout) -->
+      <div class="couple-container">
+
+        <!-- Groom Row (Top) -->
+        <div class="mempelai-row groom-row">
+          <!-- Left: Groom Photo (Top Left Corner) -->
+          <div class="mempelai-photo-block groom-photo-anim groom-photo">
+            <img src="groom.png" alt="Majnun Al Ayyub" class="mempelai-png-photo">
+          </div>
+          <!-- Right: Groom Info -->
+          <div class="mempelai-info-block groom-info">
+            <h3 class="mempelai-name">Mohammad Rio (Anak terakhir dari Bapak Alimuddin dan Ibu Seltian)</h3>
+          </div>
+        </div>
+
+        <!-- Bride Row (Bottom) -->
+        <div class="mempelai-row bride-row">
+          <!-- Left: Bride Info -->
+          <div class="mempelai-info-block bride-info">
+            <h3 class="mempelai-name">Anisa K. Saum, S.Pd (Anak Kedua dari Bapak Kissman Dj. Saum dan Ibu Farida S. Hadu)</h3>
+          </div>
+          <!-- Right: Bride Photo (Bottom Right Corner) -->
+          <div class="mempelai-photo-block bride-photo-anim bride-photo">
+            <img src="bride.png" alt="Al Warda" class="mempelai-png-photo">
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom Rotating Ornament -->
+      <div class="couple-decor-wrapper decor-bottom-pos">
+        <img src="ornamen3.png" alt="Rotating Decor Bottom" class="couple-decor-img spinning-ornament">
+      </div>
+
+    </div>
+
+    <!-- SCHEDULE SCREEN (Section 3 - Event Details/Schedule) -->
+    <div id="schedule-screen" class="screen hidden-screen">
+
+      <!-- ornamen10.png transparent frame overlay -->
+      <div class="schedule-frame-overlay"></div>
+
+      <!-- Content Container -->
+      <div class="schedule-container">
+
+
+        <!-- Save the Date & Countdown Timer -->
+        <div class="countdown-section animate-schedule-countdown">
+          <h3 class="countdown-title">Save The Date</h3>
+          <div id="countdown" class="countdown-timer">
+            <div class="time-block">
+              <span id="days" class="time-val">00</span>
+              <span class="time-lbl">Hari</span>
+            </div>
+            <div class="time-block">
+              <span id="hours" class="time-val">00</span>
+              <span class="time-lbl">Jam</span>
+            </div>
+            <div class="time-block">
+              <span id="minutes" class="time-val">00</span>
+              <span class="time-lbl">Menit</span>
+            </div>
+            <div class="time-block">
+              <span id="seconds" class="time-val">00</span>
+              <span class="time-lbl">Detik</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cards Container -->
+        <div class="schedule-cards">
+
+          <!-- Malam Resepsi Card Wrapper (Beautiful Arch/Dome Card) -->
+          <div class="card-anim-wrapper animate-card-single">
+            <div class="schedule-card single-resepsi-card">
+              <div class="card-content">
+                <!-- Lantern/Star Ornament at the top of the Dome -->
+                <div class="card-lantern">
+                  <i class="fa-solid fa-bahai gold-glow"></i>
+                </div>
+                <div class="card-ornament">✦ ⚜ ✦</div>
+                <h3 class="card-event-title">Akad Nikah & Resepsi</h3>
+                
+                <div class="card-divider">
+                  <span class="divider-line"></span>
+                  <i class="fa-solid fa-heart divider-heart"></i>
+                  <span class="divider-line"></span>
+                </div>
+
+                <p class="card-date">Sabtu, 05 Desember 2026</p>
+                <p class="card-day-subtitle">(Malam Minggu)</p>
+                
+                <div class="card-details-box">
+                  <p class="card-time"><i class="fa-regular fa-clock"></i> 19.30 WITA - Selesai</p>
+                  <p class="card-location"><i class="fa-solid fa-house-chimney"></i> Kediaman Mempelai Wanita</p>
+                  <p class="card-address-sub">Rumah Bapak Samad A. Hadu<br>Kelurahan Leok II</p>
+                </div>
+                
+                <a href="https://maps.app.goo.gl/vfi6jnfcnmsbpuCt9?g_st=aw" target="_blank" class="card-map-btn">
+                  <i class="fa-solid fa-map-location-dot"></i> Lihat Lokasi
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- WEDDING GIFT SCREEN (Section 5 - Wedding Gift) -->
+    <div id="gift-screen" class="screen hidden-screen">
+
+      <!-- ornamen11.png transparent frame overlay -->
+      <div class="gift-frame-overlay"></div>
+
+      <!-- Content Container -->
+      <div class="gift-container">
+
+        <!-- Section Title -->
+        <div class="gift-header animate-gift-header">
+          <h2 class="gift-main-title">Wedding Gift</h2>
+          <p class="gift-intro">
+            Doa restu Anda adalah karunia terindah bagi kami. Namun jika Anda ingin memberikan tanda kasih, Anda dapat
+            menyalurkannya melalui rekening di bawah ini:
+          </p>
+        </div>
+
+        <!-- Gift Cards Wrapper -->
+        <div class="gift-cards animate-gift-cards">
+
+          <!-- Card: BNI -->
+          <div class="gift-card bni-gift-card">
+            <div class="gift-card-content">
+              <div class="bank-logo">BRI</div>
+              <div class="account-details">
+                <span class="account-label">No. Rekening:</span>
+                <span class="account-number" id="bri-number">736501023928535</span>
+                <span class="account-name">a.n Alwarda</span>
+              </div>
+              <button class="btn-copy" data-target="bri-number">
+                <i class="fa-regular fa-copy"></i> Salin Rekening
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- WISHES & RSVP SCREEN (Section 6 - Kirim Ucapan) -->
+    <div id="wishes-screen" class="screen hidden-screen">
+
+      <!-- Corner Ornaments using ornamen8.png (Static, Large) -->
+      <img src="ornamen8.png" alt="Decor TL" class="wishes-decor decor-tl">
+      <img src="ornamen8.png" alt="Decor TR" class="wishes-decor decor-tr">
+      <img src="ornamen8.png" alt="Decor BL" class="wishes-decor decor-bl">
+      <img src="ornamen8.png" alt="Decor BR" class="wishes-decor decor-br">
+
+      <!-- Content Container -->
+      <div class="wishes-container">
+
+        <!-- Section Title -->
+        <div class="wishes-header animate-wishes-header">
+          <h2 class="wishes-main-title">Ucapan & Doa</h2>
+          <p class="wishes-subtitle">Berikan doa restu Anda untuk kedua mempelai</p>
+        </div>
+
+        <!-- Form and List wrapper -->
+        <div class="wishes-content animate-wishes-content">
+
+          <!-- Wishes Form -->
+          <form id="wishes-form" class="wishes-form">
+            <div class="form-group">
+              <input type="text" id="wish-name" class="form-input" placeholder="Nama Anda" required>
+            </div>
+            <div class="form-group">
+              <select id="wish-rsvp" class="form-input select-input" required>
+                <option value="" disabled selected>Konfirmasi Kehadiran</option>
+                <option value="Hadir">Hadir</option>
+                <option value="Tidak Hadir">Tidak Hadir</option>
+                <option value="Ragu-ragu">Ragu-ragu</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <textarea id="wish-message" class="form-input textarea-input" placeholder="Tulis ucapan & doa restu..."
+                rows="2" required></textarea>
+            </div>
+            <button type="submit" class="btn-send-wish">
+              <i class="fa-solid fa-paper-plane"></i> Kirim Ucapan
+            </button>
+          </form>
+
+          <!-- Wishes Board / List -->
+          <div class="wishes-board-container">
+            <div class="wishes-board-header">
+              <span><i class="fa-regular fa-comments"></i> <span id="wishes-count">0</span> Ucapan</span>
+            </div>
+            <div id="wishes-list" class="wishes-list">
+              <!-- Wishes items will be populated here by JS -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- THANK YOU SCREEN (Section 7 - Ucapan Terima Kasih) -->
+    <div id="thankyou-screen" class="screen hidden-screen">
+
+      <!-- Content Container -->
+      <div class="thankyou-container">
+
+        <!-- Calligraphic ornament or header -->
+        <div class="thankyou-crest animate-thankyou-crest">
+          <img src="ornamen4.png" alt="Crest" class="thankyou-mini-crest">
+        </div>
+
+        <!-- Thank You Text -->
+        <div class="thankyou-text animate-thankyou-text">
+          <h2 class="thankyou-main-title">Terima Kasih</h2>
+          <p class="thankyou-intro">
+            Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan
+            memberikan doa restu kepada kami yang sedang berbahagia.
+          </p>
+          <div class="thankyou-names">Anisa & Rio</div>
+        </div>
+
+        <!-- Couple Walking/Meeting in Center -->
+        <div class="thankyou-couple-container">
+          <img src="groom.png" alt="Groom" class="thankyou-groom animate-thankyou-groom">
+          <img src="bride.png" alt="Bride" class="thankyou-bride animate-thankyou-bride">
+        </div>
+
+        <!-- Developer Credit Footer -->
+        <div class="developer-credit animate-thankyou-credit">
+          <span>Created with <i class="fa-solid fa-heart"></i> by <a href="#" class="credit-link">WARDIGITAL</a></span>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Custom JS -->
+  <script src="script.js?v=1.5"></script>
+</body>
+
+</html>
